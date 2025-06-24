@@ -1,34 +1,19 @@
-const fs = require("fs");
+const express = require("express");
 const path = require("path");
-const url = require("url");
-const http = require("http");
+const app = express();
+
 const PORT = 3000;
-const HOST = "localhost";
-const dir = "/Users/michael1303/02_Professional/08_Jobs/04_Learning/04_Full_Stack/03_Projects/25_BasicInformationalSite"
+const DIRECTORY = "/Users/michael1303/02_Professional/08_Jobs/04_Learning/04_Full_Stack/03_Projects/25_BasicInformationalSite";
 
-const server = http.createServer((req, res) => {
+app.get("/", (req, res) => res.sendFile(path.join(DIRECTORY, "index.html")));
+app.get("/about", (req, res) => res.sendFile(path.join(DIRECTORY, "about.html")));
+app.get("/contact-me", (req, res) => res.sendFile(path.join(DIRECTORY, "contact-me.html")));
 
-    /* Creating Filepath */
-    const parsedUrl = url.parse(req.url, true);
-    let filePath = parsedUrl.pathname === '/' ? '/index' : parsedUrl.pathname;
-    filePath = path.join(dir, filePath + '.html');
-
-    /* Checking Whether Filepath exists and routing appropriately */
-    fs.readFile(filePath, (err, data) => {
-        /* Handling URL that doesn't exist */
-        if(err) {
-            const errorUrl = path.join(dir, '404.html');
-            const errorPageData = fs.readFileSync(errorUrl);
-            res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
-            return res.end(errorPageData);
-        }
-        /* Handling Working URL */
-        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-        res.end(data);
-    });
-
+app.use((req, res) => {
+  res.status(404);
+  res.sendFile(path.join(DIRECTORY, "404.html"));
 });
 
-server.listen(PORT, HOST, () => {
-  console.log(`Server running at http://${HOST}:${PORT}/`);
+app.listen(PORT, () => {
+  console.log(`Listening on http://localhost:${PORT}`);
 });
